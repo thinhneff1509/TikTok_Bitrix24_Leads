@@ -11,7 +11,3 @@ export declare class ConvertLeadDto {
 export declare class LeadIdParam {
     id: string;
 }
-export declare enum LeadStatus {
-    NEW = "new",
-    UPDATED = "updated"
-}

@@ -24,16 +24,30 @@ let ConfigService = class ConfigService {
         this.repo = repo;
     }
     async getFieldMapping() {
-        const c = this.cache['field_mapping'];
-        if (c && Date.now() - c.at < 60_000)
-            return c.data;
-        const data = (await this.repo.findOneBy({ key: 'field_mapping' }))?.value ?? {};
-        this.cache['field_mapping'] = { at: Date.now(), data };
+        return this.get('field_mapping', {});
+    }
+    async setFieldMapping(value) {
+        await this.set('field_mapping', value);
+    }
+    async getDealRules() {
+        return this.get('deal_rules', []);
+    }
+    async setDealRules(value) {
+        await this.set('deal_rules', value);
+    }
+    async get(key, fallback) {
+        const cell = this.cache[key];
+        if (cell && Date.now() - cell.at < 60_000)
+            return cell.data;
+        const row = await this.repo.findOne({ where: { key } });
+        const data = (row?.value ?? fallback);
+        this.cache[key] = { at: Date.now(), data };
         return data;
     }
-    async setFieldMapping(value) { await this.repo.upsert({ key: 'field_mapping', value }, ['key']); }
-    async getDealRules() { return (await this.repo.findOneBy({ key: 'deal_rules' }))?.value ?? []; }
-    async setDealRules(value) { await this.repo.upsert({ key: 'deal_rules', value }, ['key']); }
+    async set(key, value) {
+        await this.repo.upsert({ key, value }, ['key']);
+        this.cache[key] = { at: Date.now(), data: value };
+    }
 };
 exports.ConfigService = ConfigService;
 exports.ConfigService = ConfigService = __decorate([

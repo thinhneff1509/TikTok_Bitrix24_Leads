@@ -33,21 +33,26 @@ export class DealsService {
     }
 
     async upsertFromBitrix(payload: any) {
-        // Map data from Bitrix → internal model
-        const externalId = String(payload.id ?? '');
+        // Map data from Bitrix
+        const externalId = String(payload.id ?? payload.ID ?? '');
+        if (!externalId) {
+            throw new BadRequestException('external_id is required');
+        }
+
+        const amount =
+            payload.amount !== undefined
+                ? Number(payload.amount)
+                : payload.OPPORTUNITY !== undefined
+                    ? Number(payload.OPPORTUNITY)
+                    : undefined;
+
         const data: Partial<DealEntity> = {
-            external_id: externalId,
-            title: payload.title ?? 'Bitrix deal',
-            amount: Number(payload.amount ?? 0) || undefined,
-            currency: payload.currency ?? undefined,
-            stage: payload.stage ?? undefined,
-            raw_data: payload,
+            title: payload.title ?? payload.TITLE ?? 'Bitrix deal',
+            amount,
+            currency: payload.currency ?? payload.CURRENCY_ID ?? undefined,
+            raw_data: payload, // save to debug
         };
-        await this.repo.upsert(
-            { external_id: externalId },
-            { conflictPaths: ['external_id'], skipUpdateIfNoValuesChanged: true },
-        );
-        // upsert vào DB
+
         return this.upsertByExternalId(externalId, data);
     }
 }

@@ -28,7 +28,7 @@ export class LeadsService {
             where: [{ external_id: data.external_id }, { email: data.email ?? '' }, { phone: data.phone ?? '' }],
         });
         if (found) {
-            this.repo.merge(found, data, { status: 'updated' });
+            this.repo.merge(found, data, { status: 'updated' });  //If duplicated, it will become edit
             return this.repo.save(found);
         }
         return this.repo.save(this.repo.create(data));

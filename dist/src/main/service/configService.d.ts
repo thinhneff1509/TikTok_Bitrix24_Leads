@@ -1,11 +1,13 @@
 import { Repository } from 'typeorm';
 import { Configuration } from '../model/entities/configEntity';
 export declare class ConfigService {
-    private repo;
+    private readonly repo;
     private cache;
     constructor(repo: Repository<Configuration>);
-    getFieldMapping(): Promise<any>;
-    setFieldMapping(value: any): Promise<void>;
-    getDealRules(): Promise<any>;
+    getFieldMapping(): Promise<Record<string, string>>;
+    setFieldMapping(value: Record<string, string>): Promise<void>;
+    getDealRules(): Promise<any[]>;
     setDealRules(value: any[]): Promise<void>;
+    private get;
+    private set;
 }

@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LeadStatus = exports.LeadIdParam = exports.ConvertLeadDto = exports.ListLeadsDto = void 0;
+exports.LeadIdParam = exports.ConvertLeadDto = exports.ListLeadsDto = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
 class ListLeadsDto {
@@ -67,9 +67,4 @@ __decorate([
     (0, class_validator_1.IsUUID)('4'),
     __metadata("design:type", String)
 ], LeadIdParam.prototype, "id", void 0);
-var LeadStatus;
-(function (LeadStatus) {
-    LeadStatus["NEW"] = "new";
-    LeadStatus["UPDATED"] = "updated";
-})(LeadStatus || (exports.LeadStatus = LeadStatus = {}));
 //# sourceMappingURL=leadDto.js.map

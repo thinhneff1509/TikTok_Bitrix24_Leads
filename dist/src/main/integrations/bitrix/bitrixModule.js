@@ -8,6 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BitrixModule = void 0;
 const common_1 = require("@nestjs/common");
+const config_1 = require("@nestjs/config");
 const bitrixClient_1 = require("./bitrixClient");
 let BitrixModule = class BitrixModule {
 };
@@ -15,7 +16,17 @@ exports.BitrixModule = BitrixModule;
 exports.BitrixModule = BitrixModule = __decorate([
     (0, common_1.Global)(),
     (0, common_1.Module)({
-        providers: [{ provide: bitrixClient_1.BitrixClient, useFactory: () => new bitrixClient_1.BitrixClient() }],
+        imports: [config_1.ConfigModule],
+        providers: [
+            {
+                provide: bitrixClient_1.BitrixClient,
+                inject: [config_1.ConfigService],
+                useFactory: (cfg) => {
+                    const base = cfg.get('BITRIX_BASE_URL');
+                    return new bitrixClient_1.BitrixClient(base);
+                },
+            },
+        ],
         exports: [bitrixClient_1.BitrixClient],
     })
 ], BitrixModule);

@@ -11,7 +11,7 @@ export class BitrixWebhookController {
     @HttpCode(200)
     @ApiOperation({ summary: 'Receive Bitrix24 deal webhook' })
     @ApiBody({
-        description: 'Raw payload gửi từ Bitrix24 webhook',
+        description: 'Raw payload from Bitrix24',
         schema: {
             type: 'object',
             properties: {
@@ -24,8 +24,8 @@ export class BitrixWebhookController {
             },
         },
     })
-    async receiveDeal(@Body() payload: Record<string, any>): Promise<{ ok: true }> {
-        await this.dealsService.upsertFromBitrix(payload);
-        return { ok: true };
+    async receiveDeal(@Body() payload: any) {
+        const deal = await this.dealsService.upsertFromBitrix(payload);
+        return { ok: true, id: deal.id, external_id: deal.external_id };
     }
 }

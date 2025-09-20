@@ -1,7 +1,12 @@
 export declare class BitrixClient {
     private http;
-    constructor(base?: string, token?: string);
-    createLead(fields: any): Promise<any>;
-    updateLead(id: number, fields: any): Promise<any>;
-    createDeal(fields: any): Promise<any>;
+    private readonly log;
+    constructor(baseUrl?: string);
+    profile(): Promise<any>;
+    createLead(fields: Record<string, any>): Promise<number>;
+    updateLead(id: number, fields: Record<string, any>): Promise<boolean>;
+    createDeal(fields: Record<string, any>): Promise<number>;
+    createContact(fields: Record<string, any>): Promise<number>;
+    private call;
+    private ensureTrailingSlash;
 }

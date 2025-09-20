@@ -22,8 +22,8 @@ let BitrixWebhookController = class BitrixWebhookController {
         this.dealsService = dealsService;
     }
     async receiveDeal(payload) {
-        await this.dealsService.upsertFromBitrix(payload);
-        return { ok: true };
+        const deal = await this.dealsService.upsertFromBitrix(payload);
+        return { ok: true, id: deal.id, external_id: deal.external_id };
     }
 };
 exports.BitrixWebhookController = BitrixWebhookController;
@@ -32,7 +32,7 @@ __decorate([
     (0, common_1.HttpCode)(200),
     (0, swagger_1.ApiOperation)({ summary: 'Receive Bitrix24 deal webhook' }),
     (0, swagger_1.ApiBody)({
-        description: 'Raw payload gửi từ Bitrix24 webhook',
+        description: 'Raw payload from Bitrix24',
         schema: {
             type: 'object',
             properties: {

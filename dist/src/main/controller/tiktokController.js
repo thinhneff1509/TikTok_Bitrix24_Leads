@@ -35,7 +35,7 @@ __decorate([
     (0, swagger_1.ApiHeader)({
         name: 'tiktok-signature',
         required: true,
-        description: 'Base64 HMAC-SHA256 in RAW body, key = TIKTOK_WEBHOOK_SECRET',
+        description: 'Base64 in RawBody, key = TIKTOK_WEBHOOK_SECRET',
     }),
     (0, swagger_1.ApiBody)({
         schema: {
@@ -45,8 +45,8 @@ __decorate([
                 lead_data: {
                     type: 'object',
                     properties: {
-                        full_name: { type: 'string', example: 'Nguyen Van A' },
-                        email: { type: 'string', example: 'a@example.com' },
+                        full_name: { type: 'string', example: 'Le Truong Thinh' },
+                        email: { type: 'string', example: 'nguyenvana@example.com' },
                         phone: { type: 'string', example: '+84901234567' },
                     },
                 },

@@ -39,16 +39,21 @@ let DealsService = class DealsService {
         return this.repo.findOneByOrFail({ external_id: externalId });
     }
     async upsertFromBitrix(payload) {
-        const externalId = String(payload.id ?? '');
+        const externalId = String(payload.id ?? payload.ID ?? '');
+        if (!externalId) {
+            throw new common_1.BadRequestException('external_id is required');
+        }
+        const amount = payload.amount !== undefined
+            ? Number(payload.amount)
+            : payload.OPPORTUNITY !== undefined
+                ? Number(payload.OPPORTUNITY)
+                : undefined;
         const data = {
-            external_id: externalId,
-            title: payload.title ?? 'Bitrix deal',
-            amount: Number(payload.amount ?? 0) || undefined,
-            currency: payload.currency ?? undefined,
-            stage: payload.stage ?? undefined,
+            title: payload.title ?? payload.TITLE ?? 'Bitrix deal',
+            amount,
+            currency: payload.currency ?? payload.CURRENCY_ID ?? undefined,
             raw_data: payload,
         };
-        await this.repo.upsert({ external_id: externalId }, { conflictPaths: ['external_id'], skipUpdateIfNoValuesChanged: true });
         return this.upsertByExternalId(externalId, data);
     }
 };
