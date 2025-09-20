@@ -178,8 +178,8 @@ node -e "const crypto=require('crypto'); const body=process.argv[1]; const secre
        - Body mẫu:
 {
 "lead_data.full_name": "NAME",
-"lead_data.email": "EMAIL[0][VALUE]",
-"lead_data.phone": "PHONE[0][VALUE]",
+"lead_data.email": "EMAIL",
+"lead_data.phone": "PHONE",
 "lead_data.city": "UF_CRM_CITY",
 "campaign.campaign_name": "UF_CRM_UTM_CAMPAIGN",
 "campaign.ad_name": "UF_CRM_AD_NAME",
