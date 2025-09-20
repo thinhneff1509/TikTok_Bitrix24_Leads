@@ -1,98 +1,230 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# TikTok_Bitrix24_Leads
+Ứng dụng tích hợp TikTok Lead Generation với Bitrix24 CRM.
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+1) Các bước thực hiện
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Setup dự án: npm install
 
-## Description
+Tạo .env (tham khảo .env.example): cp .env.example .env
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Chay docker:  "docker compose up -d".
+Recommend: nên dùng app docker để check log cụ thể
 
-## Project setup
+tạo db tự động: "npm run db:generate"
 
-```bash
-$ npm install
-```
+Chạy Database: "npm run db:migrate"
 
-## Compile and run the project
+Chạy ứng dụng: "npm run start: dev"
 
-```bash
-# development
-$ npm run start
+run test: npm run test,
+npm run test:e2e,
+npm run test:cov
 
-# watch mode
-$ npm run start:dev
+Test sau khi chạy ứng dụng:
+http://localhost:3000/docs để test trên swagger hoặc test trên postman. ngoài ra có thể vào:
+http://localhost:3000/health để test
 
-# production mode
-$ npm run start:prod
-```
 
-## Run tests
+dám 2 dòng trên vào CMD để tạo file thì coppy key dưới cùng để test api : /webhooks/tiktok/leads.
 
-```bash
-# unit tests
-$ npm run test
+2) Cấu trúc dự án:
 
-# e2e tests
-$ npm run test:e2e
+src/
+└─ main/
+├─ common/            # Tiện ích dùng chung cho toàn app
+│  ├─ filters/        # HttpExceptionFilter, v.v.
+│  ├─ interceptors/   # LoggingInterceptor, đo thời gian, v.v.
+│  ├─ pipes/          # ValidationPipe, parse/transform input
+│  └─ utils/          # helper: verifySignature, chuẩn hoá phone, ...
+├─ config/            # Đọc/validate ENV, cấu hình App/Swagger (nếu có)
+├─ controller/        # Lớp HTTP adapter (REST endpoints)
+├─ exception/         # Lỗi tuỳ biến (AppError, …)
+├─ integrations/
+│  └─ bitrix/         # Tích hợp Bitrix24 (BitrixClient, BitrixModule)
+├─ jobs/              # BullMQ processor, push job sync sang Bitrix
+├─ model/
+│  ├─ dto/            # DTO + class-validator cho request/response
+│  └─ entities/       # TypeORM entities (LeadEntity, DealEntity, Configuration)
+├─ module/
+│  ├─ database/       # Kết nối TypeORM, migrations, seeds
+│  ├─ analyticsModule.ts
+│  ├─ configStoreModule.ts
+│  ├─ dealsModule.ts
+│  ├─ exporterModule.ts
+│  └─ leadsModule.ts
+├─ service/           # Business logic (LeadsService, DealsService, …)
+├─ app.controller.spec.ts  # unit test
+├─ app.controller.ts       
+├─ app.module.ts           
+├─ app.service.ts          
+└─ main.ts                 # Bootstrap Nest (global pipes/filters, Swagger)
 
-# test coverage
-$ npm run test:cov
-```
+3) Architecture diagram (lowchart LR):
 
-## Deployment
+- TT[TikTok Lead Gen] -->|Webhook| A[/POST /webhooks/tiktok/leads/]
+- A --> TikTokSvc[TikTokService]
+- TikTokSvc --> LeadsSvc[LeadsService]
+- LeadsSvc --> PG[(PostgreSQL)]
+- LeadsSvc -->|enqueue| Q[(Redis/BullMQ)]
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+- Q --> Job[BitrixSyncProcessor]
+- Job -->|REST| BX[Bitrix24 API]
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+- BX24[Bitrix24] -->|Webhook| B[/POST /webhooks/bitrix24/deals/]
+- B --> DealsSvc[DealsService]
+- DealsSvc --> PG
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+- Analytics[AnalyticsService] --> PG
+- Exporter[ExporterService] --> PG
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+- Docs[Swagger UI /docs] -.-> App[NestJS App]
+- Health[/GET /health/] -.-> App
 
-## Resources
+Luồng điển hình:
 
-Check out a few resources that may come in handy when working with NestJS:
+- TikTok → POST /webhooks/tiktok/leads (controller)
+- TikTokService → LeadsService: sanitize + upsert DB → enqueue job sync Bitrix (nếu rule)
+- BitrixSyncProcessor (jobs) đọc từ Redis → gọi BitrixClient (crm.lead.add/crm.deal.add)
+- ConfigStore: GET/PUT /api/v1/config/mappings|rules lưu JSON (CONFIGURATIONS.value)
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+Hàng đợi & giới hạn tốc độ:
 
-## Support
+- Job xử lý đồng bộ sang Bitrix chạy trong BullMQ trên Redis.
+- Có rate limit để tránh quota API (ví dụ 40 job/giây hoặc theo BITRIX_RATE_*).
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
-## Stay in touch
+Database ERD:
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+    LEADS {
+        uuid id PK
+        varchar(128) external_id "UK"
+        varchar(32)  source
+        varchar(255) name
+        varchar(255) email
+        varchar(32)  phone
+        varchar(64)  campaign_id
+        varchar(64)  ad_id
+        jsonb        raw_data
+        int          bitrix24_id
+        varchar(32)  status
+        Date    created_at
+        Date    updated_at
+    }
 
-## License
+    DEALS {
+      uuid id PK
+      int          bitrix24_id
+      varchar(255) title
+      numeric(14,2) amount
+      varchar(8)   currency
+      varchar(64)  stage
+      int          probability
+      varchar(128) external_id "UK"
+      jsonb        raw_data
+      uuid         lead_id FK
+      Date    created_at
+      Date    updated_at
+    }
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+    CONFIGURATIONS {
+      int id PK
+      varchar(64) key "UK"
+      jsonb       value
+      Date   updated_at
+    }
+
+    LEADS ||--o{ DEALS : "lead_id (nullable)"
+
+
+4) Kiểm thử: Testing Api
+- Webhook TikTok:
+    - Ký HMAC (sha256) cho body:
+      set SECRET=1830e364a4b724e65b110bdd9f2bb3d4c4959c9a280e94ff3d1b764bab80597e
+      node -e "const crypto=require('crypto'); const body=process.argv[1]; const secret=process.env.SECRET; console.log(crypto.createHmac('sha256', secret).update(body).digest('base64'));" "{\"event_id\":\"evt_1001\",\"lead_data\":{\"full_name\":\"Nguyen Van A\",\"email\":\"a@example.com\",\"phone\":\"+84901234567\"},\"campaign\":{\"campaign_id\":\"cmp_111\",\"ad_id\":\"ad_222\"}}"
+
+    - Copy giá trị in ra → điền vào header tiktok-signature.
+
+    - Với DEV có SKIP_SIGNATURE_VERIFY=1, bạn có thể bỏ qua bước này.
+
+- Gọi API POST /webhooks/tiktok/leads:
+    - Headers:
+        - Content-Type: application/json
+        - tiktok-signature: <base64 hmac>
+
+    - Body (Example):
+        - {
+          "event_id": "evt_1001",
+          "lead_data": {
+          "full_name": "Nguyen Van A",
+          "email": "a@example.com",
+          "phone": "+84901234567"
+          },
+          "campaign": { "campaign_id": "cmp_111", "ad_id": "ad_222" }
+          }
+
+    - Kết quả: lead được upsert vào bảng leads (tránh trùng theo external_id/email/phone) và enqueue job đẩy sang Bitrix nếu rule phù hợp.
+
+- Endpoints quản trị & cấu hình:
+    - Leads/Deals:
+        - GET /api/v1/leads?page=1&limit=10&source=tiktok
+        - POST /api/v1/leads/{id}/convert-to-deal
+            - Body:{ "title": "Deal from TikTok", "amount": 1000000, "currency": "VND" }
+
+        - GET /api/v1/deals?status=open&assigned_to=<user_id> (nếu đã hiện thực)
+
+- Config mappings & rules:
+    - GET /api/v1/config/mappings
+    - PUT /api/v1/config/mappings
+        - Body mẫu:
+          {
+          "lead_data.full_name": "NAME",
+          "lead_data.email": "EMAIL",
+          "lead_data.phone": "PHONE",
+          "lead_data.city": "UF_CRM_CITY",
+          "campaign.campaign_name": "UF_CRM_UTM_CAMPAIGN",
+          "campaign.ad_name": "UF_CRM_AD_NAME",
+          "lead_data.ttclid": "UF_CRM_TTCLID"
+          }
+
+    - GET /api/v1/config/rules
+
+    - PUT /api/v1/config/rules
+        - Body mẫu:
+          {
+          "auto_convert": true,
+          "min_probability": 30,
+          "assign_user_id": 123
+          }
+
+    - Hoặc biến thể rule theo đề bài (nhiều điều kiện) tuỳ vào trường hợp sử dụng để chạy.
+
+- Tích hợp Bitrix24:
+    - Base URL chuẩn Bitrix REST:
+        - https://<portal>.bitrix24.vn/rest/<user_id>/<token>
+        - Ví dụ thực thi tạo deal (server → server):
+            - Path: crm.deal.add.json
+            - Method: POST
+            - Body:{ "fields": { "TITLE": "API Deal", "OPENED": "Y" }, "params": { "REGISTER_SONET_EVENT": "N" } }
+
+        - Nếu gọi sai đường dẫn (thiếu /rest/<user>/<token>), Bitrix sẽ trả 404 Not Found (Nginx).
+
+- Client DI:
+    - BitrixClient khởi tạo từ env:
+        - BITRIX_BASE_URL (ở real phải chứa /rest/<user>/<token>)
+        - BITRIX_TOKEN (tùy mock)
+    - Rate limit job khi đẩy sang Bitrix dựa theo BITRIX_RATE_MAX, BITRIX_RATE_DURATION (ms).
+
+- Analytics & Export:
+    - GET /api/v1/analytics/conversion-rates
+    - GET /api/v1/analytics/campaign-performance
+    - GET /api/v1/reports/export?format=csv&date_range=30d
+
+11) Troubleshooting
+    Vấn đề	                                            Nguyên nhân thường gặp	                                 Cách khắc phục
+    500 khi POST /webhooks/bitrix24/deals	            Body không đúng schema	                                 Gửi JSON theo mẫu (id/title/amount/currency hoặc payload bạn đã định nghĩa). Xem log server.
+    404 Not Found khi gọi Bitrix từ Postman	            Sai base URL Bitrix (thiếu /rest/<user>/<token>)	     Sửa BITRIX_BASE_URL đúng format Bitrix REST, gọi đúng method crm.deal.add.json.
+    Signature sai khi test TikTok	                    Sai secret/không base64	                                 Tạo lại chữ ký HMAC-SHA256 với secret đúng; hoặc bật SKIP_SIGNATURE_VERIFY=1 trong DEV.
+    Không thấy lead mới	                                external_id/email/phone trùng	                         Upsert đã gộp; đổi event_id hoặc email/phone để sinh lead mới.
+    DB connect lỗi	                                    Chưa chạy Postgres/Redis, port sai	                     docker compose up -d, kiểm tra .env & firewall.
+    Hàng đợi không đẩy sang Bitrix	                    Redis không chạy/queue blocked	                         Kiểm tra Redis, rate limit, và log của BitrixSyncProcessor.
+    Swagger không có endpoint mới	                    Chưa rebuild/khởi động lại	                             Khởi động lại app, kiểm tra decorators @Api* có đúng.
