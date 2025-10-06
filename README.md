@@ -3,18 +3,18 @@
 
 1) Các bước thực hiện
 
-Setup dự án: npm install
+ Bước 1: Setup dự án: npm install
 
-Tạo .env (tham khảo .env.example): cp .env.example .env
+ Bước 2: Tạo .env (tham khảo .env.example): cp .env.example .env
 
-Chay docker:  "docker compose up -d".
+ Bước 3: Chay docker:  "docker compose up -d".
 Recommend: nên dùng app docker để check log cụ thể
 
-tạo db tự động: "npm run db:generate"
+ Bước 4: tạo db tự động: "npm run db:generate"
 
-Chạy Database: "npm run db:migrate"
+ Bước 5: Chạy Database: "npm run db:migrate"
 
-Chạy ứng dụng: "npm run start: dev"
+ Bước 6: Chạy ứng dụng: "npm run start: dev"
 
 run test: npm run test,
 npm run test:e2e,
@@ -22,10 +22,7 @@ npm run test:cov
 
 Test sau khi chạy ứng dụng:
 http://localhost:3000/docs để test trên swagger hoặc test trên postman. ngoài ra có thể vào:
-http://localhost:3000/health để test
-
-
-dám 2 dòng trên vào CMD để tạo file thì coppy key dưới cùng để test api : /webhooks/tiktok/leads.
+http://localhost:3000/health để test.
 
 2) Cấu trúc dự án:
 
