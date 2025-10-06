@@ -5,8 +5,8 @@ import { ExporterController } from '../controller/exporterController';
 import { ExporterService } from '../service/exporterService';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([LeadEntity])],
-    controllers: [ExporterController],
-    providers: [ExporterService],
+  imports: [TypeOrmModule.forFeature([LeadEntity])],
+  controllers: [ExporterController],
+  providers: [ExporterService],
 })
 export class ExporterModule {}

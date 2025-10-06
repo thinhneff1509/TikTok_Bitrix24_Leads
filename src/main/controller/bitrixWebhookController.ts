@@ -5,27 +5,27 @@ import { DealsService } from '../service/dealsService';
 @ApiTags('Bitrix24')
 @Controller('webhooks/bitrix24')
 export class BitrixWebhookController {
-    constructor(private readonly dealsService: DealsService) {}
+  constructor(private readonly dealsService: DealsService) {}
 
-    @Post('deals')
-    @HttpCode(200)
-    @ApiOperation({ summary: 'Receive Bitrix24 deal webhook' })
-    @ApiBody({
-        description: 'Raw payload from Bitrix24',
-        schema: {
-            type: 'object',
-            properties: {
-                id: { type: 'string', example: 'B24_12345' },
-                title: { type: 'string', example: 'Bitrix deal' },
-                amount: { type: 'number', example: 5000000 },
-                currency: { type: 'string', example: 'VND' },
-                lead_external_id: { type: 'string', example: 'evt_1001' },
-                custom_fields: { type: 'object', additionalProperties: true },
-            },
-        },
-    })
-    async receiveDeal(@Body() payload: any) {
-        const deal = await this.dealsService.upsertFromBitrix(payload);
-        return { ok: true, id: deal.id, external_id: deal.external_id };
-    }
+  @Post('deals')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Receive Bitrix24 deal webhook' })
+  @ApiBody({
+    description: 'Raw payload from Bitrix24',
+    schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', example: 'B24_12345' },
+        title: { type: 'string', example: 'Bitrix deal' },
+        amount: { type: 'number', example: 5000000 },
+        currency: { type: 'string', example: 'VND' },
+        lead_external_id: { type: 'string', example: 'evt_1001' },
+        custom_fields: { type: 'object', additionalProperties: true },
+      },
+    },
+  })
+  async receiveDeal(@Body() payload: any) {
+    const deal = await this.dealsService.upsertFromBitrix(payload);
+    return { ok: true, id: deal.id, external_id: deal.external_id };
+  }
 }

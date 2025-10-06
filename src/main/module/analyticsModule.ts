@@ -6,8 +6,8 @@ import { AnalyticsController } from '../controller/analyticsController';
 import { AnalyticsService } from '../service/analyticsService';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([LeadEntity, DealEntity])],
-    controllers: [AnalyticsController],
-    providers: [AnalyticsService],
+  imports: [TypeOrmModule.forFeature([LeadEntity, DealEntity])],
+  controllers: [AnalyticsController],
+  providers: [AnalyticsService],
 })
 export class AnalyticsModule {}

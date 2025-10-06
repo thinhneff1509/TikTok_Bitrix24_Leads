@@ -5,9 +5,9 @@ import { DealsService } from '../service/dealsService';
 import { DealsController } from '../controller/dealsController';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([DealEntity])],
-    controllers: [DealsController],
-    providers: [DealsService],
-    exports: [DealsService],
+  imports: [TypeOrmModule.forFeature([DealEntity])],
+  controllers: [DealsController],
+  providers: [DealsService],
+  exports: [DealsService],
 })
 export class DealsModule {}

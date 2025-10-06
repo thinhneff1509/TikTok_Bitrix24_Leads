@@ -4,8 +4,8 @@ import { BitrixModule } from '../integrations';
 
 @Global()
 @Module({
-    imports: [BitrixModule],
-    providers: [BitrixSyncProcessor],
-    exports: [BitrixSyncProcessor],
+  imports: [BitrixModule],
+  providers: [BitrixSyncProcessor],
+  exports: [BitrixSyncProcessor],
 })
 export class JobsModule {}

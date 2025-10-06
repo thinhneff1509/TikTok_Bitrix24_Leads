@@ -10,19 +10,27 @@
  Bước 3: Chay docker:  "docker compose up -d".
 Recommend: nên dùng app docker để check log cụ thể
 
- Bước 4: tạo db tự động: "npm run db:generate"
+ Bước 4: Tạo Database tự động: "npm run db:generate". 
+
+(Nếu bạn bị lỗi khi tạo DB thì bạn vào folder src/main/module/database rồi tạo cho mình 1 folder rỗng tên là "migration").
+
+(Nếu bạn bị lỗi khi tạo DB bị lỗi này: "No changes in database schema were found – cannot generate a migration." thì chạy câu lệnh xoá schema DB hiện tại: 
+ "npm run db:drop" rồi chạy lại bước 4).
 
  Bước 5: Chạy Database: "npm run db:migrate"
 
- Bước 6: Chạy ứng dụng: "npm run start: dev"
+ Bước 6: Chạy ứng dụng: "npm run start:dev".
+ Bạn vào đường dẫn này:
+ http://localhost:3000/docs để test trên swagger hoặc bạn có thể test api trên postman. Trong đó có 1 api test "Heath" để tiện sử dụng.
 
-run test: npm run test,
-npm run test:e2e,
-npm run test:cov
+ Bước 7: Câu lệnh run Test:
 
-Test sau khi chạy ứng dụng:
-http://localhost:3000/docs để test trên swagger hoặc test trên postman. ngoài ra có thể vào:
-http://localhost:3000/health để test.
+- "npm run test:cov"
+
+- Các bài kiểm tra E2E yêu cầu tiền tố toàn cục `/api/v1` của bạn. Nếu ứng dụng của bạn không thiết lập tiền tố này, hãy xóa `setGlobalPrefix` trong `test-app.factory.ts` hoặc cập nhật URL cho phù hợp.
+- Các phụ thuộc bên ngoài (Redis/BullMQ/Bitrix) được mô phỏng trong các bài kiểm tra để chúng không mở các kết nối thực.
+- Kiểm tra chữ ký TikTok bị vô hiệu hóa trong các bài kiểm tra thông qua `SKIP_SIGNATURE_VERIFY=1`.
+
 
 2) Cấu trúc dự án:
 

@@ -5,9 +5,9 @@ import { ConfigService } from '../service/configService';
 import { ConfigController } from '../controller/configController';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Configuration])],
-    controllers: [ConfigController],
-    providers: [ConfigService],
-    exports: [ConfigService],
+  imports: [TypeOrmModule.forFeature([Configuration])],
+  controllers: [ConfigController],
+  providers: [ConfigService],
+  exports: [ConfigService],
 })
 export class ConfigStoreModule {}
